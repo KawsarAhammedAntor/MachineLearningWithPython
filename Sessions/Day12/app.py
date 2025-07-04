@@ -1,39 +1,51 @@
 from flask import Flask, render_template, request
+import pandas as pd
 import joblib
-import numpy as np
+import os
 
 app = Flask(__name__)
 
-# Load the trained model
-model = joblib.load(r'Sessions\Day12\insurance_model.pkl')
+# Load the trained model using a path relative to this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(script_dir, 'insurance_model.pkl')
+model = joblib.load(model_path)
 
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def index():
     prediction = None
+    # Default values
+    form_data = {
+        'age': 30,
+        'sex': 'female',
+        'bmi': 25.0,
+        'children': 0,
+        'smoker': 'no',
+        'region': 'northeast'
+    }
     if request.method == 'POST':
-        # Get values from the form
-        age = float(request.form['age'])
-        sex = 1 if request.form['sex'] == 'male' else 0
-        bmi = float(request.form['bmi'])
-        children = float(request.form['children'])
-        smoker = 1 if request.form['smoker'] == 'yes' else 0
-        
-        # Get region values
-        region = request.form['region']
-        region_northeast = 1 if region == 'northeast' else 0
-        region_northwest = 1 if region == 'northwest' else 0
-        region_southeast = 1 if region == 'southeast' else 0
-        region_southwest = 1 if region == 'southwest' else 0
-
-        # Create feature array
-        features = np.array([[age, sex, bmi, children, smoker, 
-                            region_northeast, region_northwest, 
-                            region_southeast, region_southwest]])
-
-        # Make prediction
-        prediction = model.predict(features)[0]
-
-    return render_template('index.html', prediction=prediction)
+        form_data['age'] = int(request.form['age'])
+        form_data['sex'] = request.form['sex']
+        form_data['bmi'] = float(request.form['bmi'])
+        form_data['children'] = int(request.form['children'])
+        form_data['smoker'] = request.form['smoker']
+        form_data['region'] = request.form['region']
+        sex = 1 if form_data['sex'] == 'male' else 0
+        smoker = 1 if form_data['smoker'] == 'yes' else 0
+        input_dict = {
+            'age': form_data['age'],
+            'sex': sex,
+            'bmi': form_data['bmi'],
+            'children': form_data['children'],
+            'smoker': smoker,
+            'region_northeast': 1 if form_data['region'] == 'northeast' else 0,
+            'region_northwest': 1 if form_data['region'] == 'northwest' else 0,
+            'region_southeast': 1 if form_data['region'] == 'southeast' else 0,
+            'region_southwest': 1 if form_data['region'] == 'southwest' else 0,
+        }
+        input_df = pd.DataFrame([input_dict])
+        pred = model.predict(input_df)[0]
+        prediction = f"${pred:,.2f}"
+    return render_template('index.html', prediction=prediction, form_data=form_data)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)

@@ -3,86 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insurance Cost Predictor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Insurance Charges Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            height: 100%;
+        }
         body {
-            background-color: #f8f9fa;
-            padding: 20px;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            /* Medical image background */
+            background-image: url('/static/img4.jpg'), linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-blend-mode: lighten;
         }
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-top: 20px;
+            max-width: 650px;
+            margin: 24px auto;
+            background: rgba(255,255,255,0.92);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            padding: 24px 32px 16px 32px;
         }
-        .prediction {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 5px;
+        h1 {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 18px;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            justify-content: space-between;
+        }
+        .form-group {
+            flex: 1 1 220px;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        input, select {
+            padding: 7px 10px;
+            border-radius: 6px;
+            border: 1px solid #bdbdbd;
+            font-size: 15px;
+        }
+        button {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 18px auto 0 auto;
+            display: block;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #38f9d7 0%, #43e97b 100%);
+        }
+        .result-box {
+            background: #d4edda;
+            color: #155724;
+            border-radius: 10px;
+            padding: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 18px;
+            border: 2px solid #43e97b;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 10px; }
+            form { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mb-4">Insurance Cost Predictor</h2>
-        <form method="post">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="age" class="form-label">Age</label>
-                    <input type="number" class="form-control" id="age" name="age" required min="18" max="100">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="sex" class="form-label">Sex</label>
-                    <select class="form-select" id="sex" name="sex" required>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
+        <h1>Insurance Charges Predictor</h1>
+        <form method="post" autocomplete="off">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="18" max="100" value="{{ form_data['age'] }}" required>
             </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="bmi" class="form-label">BMI</label>
-                    <input type="number" class="form-control" id="bmi" name="bmi" required step="0.1" min="10" max="60">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="children" class="form-label">Number of Children</label>
-                    <input type="number" class="form-control" id="children" name="children" required min="0" max="10">
-                </div>
+            <div class="form-group">
+                <label for="sex">Sex:</label>
+                <select id="sex" name="sex">
+                    <option value="female" {% if form_data['sex']=='female' %}selected{% endif %}>Female</option>
+                    <option value="male" {% if form_data['sex']=='male' %}selected{% endif %}>Male</option>
+                </select>
             </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="smoker" class="form-label">Smoker</label>
-                    <select class="form-select" id="smoker" name="smoker" required>
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="region" class="form-label">Region</label>
-                    <select class="form-select" id="region" name="region" required>
-                        <option value="northeast">Northeast</option>
-                        <option value="northwest">Northwest</option>
-                        <option value="southeast">Southeast</option>
-                        <option value="southwest">Southwest</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="bmi">BMI:</label>
+                <input type="number" id="bmi" name="bmi" min="10" max="60" step="0.1" value="{{ form_data['bmi'] }}" required>
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Predict Insurance Cost</button>
+            <div class="form-group">
+                <label for="children">Number of Children:</label>
+                <input type="number" id="children" name="children" min="0" max="5" value="{{ form_data['children'] }}" required>
             </div>
+            <div class="form-group">
+                <label for="smoker">Smoker:</label>
+                <select id="smoker" name="smoker">
+                    <option value="no" {% if form_data['smoker']=='no' %}selected{% endif %}>No</option>
+                    <option value="yes" {% if form_data['smoker']=='yes' %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="region">Region:</label>
+                <select id="region" name="region">
+                    <option value="northeast" {% if form_data['region']=='northeast' %}selected{% endif %}>Northeast</option>
+                    <option value="northwest" {% if form_data['region']=='northwest' %}selected{% endif %}>Northwest</option>
+                    <option value="southeast" {% if form_data['region']=='southeast' %}selected{% endif %}>Southeast</option>
+                    <option value="southwest" {% if form_data['region']=='southwest' %}selected{% endif %}>Southwest</option>
+                </select>
+            </div>
+            <button type="submit">Predict Charges</button>
         </form>
-
-        {% if prediction is not none %}
-        <div class="prediction text-center">
-            <h4>Predicted Insurance Cost:</h4>
-            <h3>${{ "%.2f"|format(prediction) }}</h3>
-        </div>
+        {% if prediction %}
+            <div class="result-box">Predicted Charges: {{ prediction }}</div>
         {% endif %}
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>
